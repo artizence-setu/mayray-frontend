@@ -1,23 +1,24 @@
 import type { Metadata } from "next";
-import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
-  import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
+import { Poppins, Lily_Script_One } from "next/font/google";
+import { DownloadsProvider } from "./components/downloads-context";
 
 const poppins = Poppins({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-poppins",
-  weight: ["400", "500", "600", "700"], 
 });
 
-const inter = Inter({
+const lily = Lily_Script_One({
   subsets: ["latin"],
-  variable: "--font-inter",
-  weight: ["300", "400", "500"],
+  weight: "400",
+  variable: "--font-lily",
 });
 
 export const metadata: Metadata = {
   title: "Your App Name",
-  description: "Modern UI with Poppins + Inter fonts",
+  description: "project",
 };
 
 export default function RootLayout({
@@ -26,13 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${poppins.variable} ${inter.variable} antialiased font-body  cz-shortcut-listen="true"`}
-      >
-        {children}
-                <ToastContainer />
+    <html lang="en" className={`${poppins.variable} ${lily.variable}`}>
+      <body className="antialiased font-body">
+            <DownloadsProvider>
 
+        {children}
+        <ToastContainer />
+          </DownloadsProvider>
       </body>
     </html>
   );

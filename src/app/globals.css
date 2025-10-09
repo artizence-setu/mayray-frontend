@@ -76,9 +76,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
- 
-  --font-heading: var(--font-poppins);
-  --font-body: var(--font-inter);
+   --font-poppins: 'Poppins', sans-serif;
+    --font-lily: "Lily Script One", cursive;
+
 
 }
 
@@ -115,15 +115,9 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
-h1, h2, h3, h4, h5, h6, button, label {
-  font-family: var(--font-heading), sans-serif;
-  font-weight: 600;
-}
 
-body, input, textarea, p, span {
-  font-family: var(--font-body), sans-serif;
-  font-weight: 400;
-}
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -133,6 +127,13 @@ body, input, textarea, p, span {
   }
 }
 
+h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-lily), cursive;
+    font-weight: 300;
+  }
 .container{
   max-width: 1320px;
   margin: 0 auto;
