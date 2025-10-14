@@ -43,7 +43,6 @@ export function DownloadsProvider({ children }: { children: React.ReactNode }) {
   const startDownload = async (app: AppItem) => {
     if (isDownloaded(app.id) || isDownloading(app.id)) return
     setPending((p) => ({ ...p, [app.id]: true }))
-    // simulate download
     await new Promise((r) => setTimeout(r, 1200))
     setDownloaded((prev) => {
       if (prev.some((a) => a.id === app.id)) return prev

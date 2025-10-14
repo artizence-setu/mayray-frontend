@@ -21,7 +21,6 @@ const BACKGROUND_IMAGES = [
 export function HeroSection() {
   const [currentBgIndex, setCurrentBgIndex] = useState(0)
 
-  // Access downloaded apps
   const { downloaded } = useDownloads()
 
   const handleProfileClick = () => {
@@ -74,8 +73,19 @@ export function HeroSection() {
           }}
           className="absolute bottom-0 left-1/2 z-10 flex w-full -translate-x-1/2 items-center justify-between md:mx-6 rounded-3xl"
         >
-          {/* Left Plus Button + Downloaded icons */}
           <div className="ml-40 flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              {downloaded.map((app) => (
+                <Image
+                  key={app.id}
+                  src={app.iconSrc || "/placeholder.svg"}
+                  alt={app.name}
+                  width={45}
+                  height={45}
+                  className=" "
+                />
+              ))}
+            </div>
             <Button
               size="icon"
               variant="ghost"
@@ -83,25 +93,14 @@ export function HeroSection() {
             >
               <Plus className="h-6 w-6" />
             </Button>
-                     <div
-            className=" absolute -bottom-2 right-7 transform translate-x-1/2 z-10  flex w-full "
-          >
-            <Image src="/images/home.svg" height={50} width={50} alt="image" />
-          </div>
-            
-
-            <div className="flex items-center gap-2">
-              {downloaded.map((app) => (
-                <Image
-                  key={app.id}
-                  src={app.iconSrc || "/placeholder.svg"}
-                  alt={app.name}
-                  width={36}
-                  height={36}
-                  className="rounded-full border border-white/60 bg-white/80 shadow-sm"
-                />
-              ))}
+            <div
+              className=" absolute -bottom-2 right-7 transform translate-x-1/2 z-10  flex w-full "
+            >
+              <Image src="/images/home.svg" height={50} width={50} alt="image" />
             </div>
+
+
+
           </div>
 
           <Button

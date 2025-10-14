@@ -18,6 +18,11 @@ const APPS: AppItem[] = [
   { id: "gdrive", name: "Google Drive", iconSrc: "/images/icons/google-drive.svg" },
   { id: "instagram-2", name: "Instagram", iconSrc: "/images/icons/linkedin.svg" },
   { id: "chatgpt", name: "ChatGpt", iconSrc: "/images/icons/openai.svg" },
+  { id: "chatgpt-1", name: "ChatGpt", iconSrc: "/images/icons/openai.svg" },
+  { id: "chatgpt-2", name: "ChatGpt", iconSrc: "/images/icons/openai.svg" },
+    { id: "gdrive-1", name: "Google Drive", iconSrc: "/images/icons/google-drive.svg" },
+
+  
 ]
 
 export function AppStoreDialog() {
@@ -32,7 +37,7 @@ export function AppStoreDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="mt-8 rounded-full bg-white px-6 py-3 text-[20px] font-medium text-foreground shadow-lg hover:bg-white/95">
+      <DialogTrigger className="mt-8 rounded-full bg-white px-6 py-3   text-[20px] font-medium text-foreground shadow-lg hover:bg-white/95">
         Browse Apps...
       </DialogTrigger>
       <DialogContent
@@ -43,20 +48,24 @@ export function AppStoreDialog() {
           borderRadius: "24px",
           boxShadow: "0 4px 20px rgba(0,0,0,0.20)",
         }}
-        className="sm:max-w-2xl"
+        className="sm:max-w-2xl "
       >
-        <DialogHeader>
+        <DialogHeader className="flex flex-row items-center gap-10">
           <DialogTitle className="text-lg font-medium">App Store</DialogTitle>
-        </DialogHeader>
-
-        {/* Search Bar */}
-        <div className="relative mt-2">
+             <div className="relative  justify-center items-center">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/60" />
           <Input
             value={q}
+             style={{
+          background: "linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)",
+          backdropFilter: "blur(8x)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          borderRadius: "24px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.20)",
+        }}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search App"
-            className="pl-9 pr-9 rounded-full bg-white/70 text-foreground placeholder:text-foreground/60"
+            className="pl-8 pr-40 py-5  w-full rounded-full text-black placeholder:text-foreground/60"
           />
           <button
             aria-label="Clear search"
@@ -69,11 +78,14 @@ export function AppStoreDialog() {
             <X className="h-4 w-4" />
           </button>
         </div>
+        </DialogHeader>
+
+     
 
         <hr className="my-3 border-white/30" />
 
         {/* Apps Grid */}
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 h-[400px] overflow-y-auto scrollbar-hide">
           {filtered.map((app) => (
             <AppRow
               key={app.id}
