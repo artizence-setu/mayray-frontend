@@ -6,6 +6,21 @@ import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+function VisuallyHidden({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "absolute inset-0 pointer-events-none overflow-hidden w-px h-px whitespace-nowrap border-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -50,9 +65,11 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  title = "Dialog",
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  title?: string
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -65,6 +82,9 @@ function DialogContent({
         )}
         {...props}
       >
+        <DialogPrimitive.Title asChild>
+          <VisuallyHidden>{title}</VisuallyHidden>
+        </DialogPrimitive.Title>
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close
@@ -140,4 +160,5 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  VisuallyHidden,
 }

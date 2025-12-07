@@ -1,12 +1,17 @@
 "use client"
 
 import Image from "next/image"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { User, Mail, Eye } from "lucide-react"
 import { MdEdit } from "react-icons/md"
 import { RiDeleteBin6Fill } from "react-icons/ri"
 import { Button } from "@/components/ui/button"
 import InputComponent from "../InputText"
+import { useUpdateAvatar } from "@/features/profile/useUpdateAvatar"
+import { toast } from "sonner"
+import { useProfile } from "@/features/profile/useProfile"
+import { useUpdateProfile } from "@/features/profile/useUpdateProfile"
+import { useQueryClient } from "@tanstack/react-query"
 
 export function AccountTab() {
   const [formdata, setFormData] = useState({
@@ -19,19 +24,73 @@ export function AccountTab() {
   })
    const [avatar, setAvatar] = useState("/images/avatar.png")
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const updateAvatar = useUpdateAvatar();
+  const queryClient = useQueryClient();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setAvatar(event.target.result as string)
-        }
-      }
-      reader.readAsDataURL(file)
+  const { data, isLoading, error } = useProfile();
+const updateProfile = useUpdateProfile();
+
+
+useEffect(() => {
+  if (data) {
+    setFormData({
+      firstName: data.first_name || "",
+      lastName: data.last_name || "",
+      email: data.email || "",
+      phoneNumber: data.phone || "",
+      currentPassword: "",
+      newPassword: ""
+    });
+
+    if (data.profile_photo_url) {
+      setAvatar(data.profile_photo_url);
     }
   }
+}, [data]);
+
+ const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    if (event.target?.result) {
+      setAvatar(event.target.result as string); // preview
+    }
+  };
+  reader.readAsDataURL(file);
+
+  // 2️⃣ Upload avatar via API
+  updateAvatar.mutate(file, {
+    onSuccess: () => {
+      toast.success("Avatar updated!");
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+};
+const handleProfileUpdate = () => {
+  updateProfile.mutate(
+    {
+      first_name: formdata.firstName,
+      last_name: formdata.lastName,
+      phone: formdata.phoneNumber,
+      email: formdata.email,
+    },
+    {
+      onSuccess: () => {
+        toast.success("Profile updated successfully!");
+
+        // 🔥 REFETCH PROFILE AFTER UPDATE
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
+      },
+      onError: (err) => {
+        toast.error(err.message);
+      },
+    }
+  );
+};
+
 
   return (
     <div className="flex flex-col gap-4 text-white">
@@ -144,9 +203,13 @@ export function AccountTab() {
               </div>
 
 
-      <Button className="self-end bg-white/70 hover:bg-white text-black rounded-full">
-        Save Changes
-      </Button>
+     <Button
+  onClick={handleProfileUpdate}
+  className="self-end bg-white/70 hover:bg-white text-black rounded-full"
+>
+  Save Changes
+</Button>
+
     </div>
   )
 }

@@ -1,61 +1,83 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useFormik } from "formik"
-import * as Yup from "yup"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { useSignup } from "@/features/auth/useSignup";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-// Validation schema using Yup
+// Yup validation
 const registerSchema = Yup.object({
-  name: Yup.string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be less than 50 characters")
-    .required("Name is required"),
-  email: Yup.string().email("Please enter a valid email address").required("Email is required"),
+  first_name: Yup.string().min(2).required("First name is required"),
+  last_name: Yup.string().min(2).required("Last name is required"),
+  email: Yup.string().email().required("Email is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+      "Password must contain uppercase, lowercase & number"
     )
     .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Please confirm your password"),
-})
+  
+});
 
 export default function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const register = useSignup();
+  const router = useRouter();
 
   const formik = useFormik({
     initialValues: {
-      name: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
     validationSchema: registerSchema,
     onSubmit: async (values) => {
-      setIsLoading(true)
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      console.log(" Register form submitted:", values)
-      setIsLoading(false)
-      // Handle registration logic here
+      setIsLoading(true);
+
+      register.mutate(
+        {
+          first_name: values.first_name,
+          last_name: values.last_name,
+          email: values.email,
+          password: values.password,
+        },
+        {
+          onSuccess: (data) => {
+            toast.success(data.message || "Registration successful!");
+            router.push("/login");
+          },
+          onError: (err: any) => {
+            toast.error(err.message);
+          },
+          onSettled: () => {
+            setIsLoading(false);
+          },
+        }
+      );
     },
-  })
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 py-12">
       <div className="w-full max-w-md">
-        {/* Logo/Brand */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Create an account</h1>
           <p className="text-muted-foreground">Start your learning journey today</p>
@@ -66,27 +88,51 @@ export default function RegisterPage() {
             <CardTitle className="text-2xl font-bold">Sign up</CardTitle>
             <CardDescription>Enter your information to create an account</CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={formik.handleSubmit} className="space-y-4">
-              {/* Name Field */}
+
+              {/* First Name */}
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="first_name">First Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    id="name"
-                    name="name"
+                    id="first_name"
+                    name="first_name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="John"
                     className="pl-10"
-                    value={formik.values.name}
+                    value={formik.values.first_name}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    aria-invalid={formik.touched.name && formik.errors.name ? "true" : "false"}
+                    aria-invalid={formik.touched.first_name && formik.errors.first_name ? "true" : "false"}
                   />
                 </div>
-                {formik.touched.name && formik.errors.name && (
-                  <p className="text-sm text-destructive">{formik.errors.name}</p>
+                {formik.touched.first_name && formik.errors.first_name && (
+                  <p className="text-sm text-destructive">{formik.errors.first_name}</p>
+                )}
+              </div>
+
+              {/* Last Name */}
+              <div className="space-y-2">
+                <Label htmlFor="last_name">Last Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="last_name"
+                    name="last_name"
+                    type="text"
+                    placeholder="Doe"
+                    className="pl-10"
+                    value={formik.values.last_name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    aria-invalid={formik.touched.last_name && formik.errors.last_name ? "true" : "false"}
+                  />
+                </div>
+                {formik.touched.last_name && formik.errors.last_name && (
+                  <p className="text-sm text-destructive">{formik.errors.last_name}</p>
                 )}
               </div>
 
@@ -142,35 +188,7 @@ export default function RegisterPage() {
                 )}
               </div>
 
-              {/* Confirm Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    className="pl-10 pr-10"
-                    value={formik.values.confirmPassword}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    aria-invalid={formik.touched.confirmPassword && formik.errors.confirmPassword ? "true" : "false"}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                  <p className="text-sm text-destructive">{formik.errors.confirmPassword}</p>
-                )}
-              </div>
+            
 
               {/* Submit Button */}
               <Button type="submit" className="w-full" disabled={isLoading || !formik.isValid}>
@@ -178,6 +196,7 @@ export default function RegisterPage() {
               </Button>
             </form>
           </CardContent>
+
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-sm text-center text-muted-foreground">
               Already have an account?{" "}
@@ -187,9 +206,7 @@ export default function RegisterPage() {
             </div>
           </CardFooter>
         </Card>
-
-        
       </div>
     </div>
-  )
+  );
 }

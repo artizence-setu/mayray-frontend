@@ -3,6 +3,9 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import { Poppins, Lily_Script_One } from "next/font/google";
 import { DownloadsProvider } from "./components/downloads-context";
+import { Providers } from "./providers";
+import { Toaster } from "@/components/ui/sonner"
+import { AuthGuard } from "@/providers/AuthGuard";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -29,11 +32,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} ${lily.variable}`}>
       <body className="antialiased font-body">
+                <AuthGuard>
+
+           <Providers>
             <DownloadsProvider>
 
-        {children}
+     {children}
         <ToastContainer />
           </DownloadsProvider>
+          </Providers>
+          </AuthGuard>
+           <Toaster position="top-center" richColors />
       </body>
     </html>
   );

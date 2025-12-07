@@ -10,7 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { toast } from "react-toastify"
+import { useLogin } from "@/features/auth/useLogin"
+import { toast } from "sonner"
+import { useAuthStore } from "@/store/auth"
 
 const loginSchema = Yup.object({
   email: Yup.string().email("Please enter a valid email address").required("Email is required"),
@@ -20,43 +22,39 @@ const loginSchema = Yup.object({
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+    const login = useLogin();
+
 const router = useRouter()
 const formik = useFormik({
-  initialValues: {
-    email: "",
-    password: "",
-  },
-  validationSchema: loginSchema,
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
   onSubmit: async (values) => {
     setIsLoading(true);
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-          credentials: "include"
+  login.mutate(values, {
+    onSuccess: (data) => {
+      toast.success("Login successful!");
 
-      });
+      useAuthStore.getState().setTokens(
+        data.tokens.access,
+        data.tokens.refresh
+      );
 
-      const data = await res.json();
-      console.log(data)
+      router.push("/profile");
+    },
 
-      if (!res.ok) {
-        toast.error(data.error  || "Login failed");
-      } else {
-        console.log("Login success:", data);
-        toast.success(data.message || "Login successful");
-        // Redirect to dashboard
-        router.push("/profile");
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      alert("Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  },
-});
+    onError: (err) => {
+      toast.error(err.message); // axios interceptor gives correct message
+    },
+    onSettled: () => {
+            setIsLoading(false);
+          },
+  });
+},
+
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -135,8 +133,8 @@ const formik = useFormik({
               </div>
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={isLoading || !formik.isValid}>
-                {isLoading ? "Signing in..." : "Sign in"}
+             <Button type="submit" className="w-full" disabled={isLoading || !formik.isValid}>
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
           </CardContent>
